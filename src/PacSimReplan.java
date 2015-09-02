@@ -33,12 +33,12 @@ public class PacSimReplan implements PacAction {
         }
         else {
             JFileChooser chooser = new JFileChooser(
-                    new File("/Users/glinosd/Desktop/Pacsim"));
+                    new File("."));
             int result = chooser.showOpenDialog(null);
 
             if( result != JFileChooser.CANCEL_OPTION ) {
                 File file = chooser.getSelectedFile();
-                fname = file.getName();
+                fname = file.getAbsolutePath();
             }
         }
         new PacSimReplan( fname );
