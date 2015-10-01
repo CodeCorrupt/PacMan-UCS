@@ -154,9 +154,9 @@ class UniformCostUtils {
     public static Point ptAndFaceToPt (Point start, PacFace face) {
         Point retPt = start;
         switch (face) {
-            case N: retPt.translate(  0,  1 ); break;
+            case N: retPt.translate(  0, -1 ); break;
             case E: retPt.translate(  1,  0 ); break;
-            case S: retPt.translate(  0, -1 ); break;
+            case S: retPt.translate(  0,  1 ); break;
             case W: retPt.translate( -1,  0 ); break;
         }
         return retPt;
