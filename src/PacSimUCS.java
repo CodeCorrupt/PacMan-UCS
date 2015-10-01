@@ -1,14 +1,10 @@
+import pacsim.*;
 
-import java.awt.Point;
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
-import javax.swing.JFileChooser;
-import pacsim.FoodCell;
-import pacsim.PacAction;
-import pacsim.PacCell;
-import pacsim.PacFace;
-import pacsim.PacSim;
-import pacsim.PacUtils;
-import pacsim.PacmanCell;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  *
@@ -16,7 +12,7 @@ import pacsim.PacmanCell;
  */
 public class PacSimUCS implements PacAction {
 
-    private Point target;
+    private Queue<PacFace> moves;
 
     public PacSimUCS(String fname) {
         PacSim sim = new PacSim( fname );
@@ -24,8 +20,6 @@ public class PacSimUCS implements PacAction {
     }
 
     public static void main( String[] args ) {
-
-        //new PacSimReplan( args[ 0 ] );
 
         String fname ="";
         if( args.length > 0 ) {
@@ -46,59 +40,38 @@ public class PacSimUCS implements PacAction {
 
     @Override
     public void init() {
-        target = null;
+        moves = new LinkedList<>();
     }
 
     @Override
     public PacFace action( Object state ) {
 
         PacCell[][] grid = (PacCell[][]) state;
-        PacFace newFace = null;
         PacmanCell pc = PacUtils.findPacman( grid );
+        PacFace newFace = null;
 
         // make sure Pacman is in this game
-        if( pc != null ) {
-            PacFace face = pc.getFace();
-
-            if( pc.getLoc().equals(target) ) {
-                target = null;
-                System.out.println("Reached target");
-            }
-
-            // if next cell in current direction is food, then keep going
-            if( PacUtils.neighbor(face, pc, grid) instanceof FoodCell ) {
-                newFace = face;
-            }
-
-            // otherwise, look for food in an adjacent cell
-            else if ( PacUtils.neighbor( PacFace.N , pc, grid) instanceof FoodCell) {
-                newFace = PacFace.N;
-            }
-            else if ( PacUtils.neighbor( PacFace.W , pc, grid) instanceof FoodCell) {
-                newFace = PacFace.W;
-            }
-            else if ( PacUtils.neighbor( PacFace.S , pc, grid) instanceof FoodCell) {
-                newFace = PacFace.S;
-            }
-            else if ( PacUtils.neighbor( PacFace.E , pc, grid) instanceof FoodCell) {
-                newFace = PacFace.E;
-            }
-
-            // otherwise, head for the nearest goody
-            else {
-                if( target == null ) {
-                    target = PacUtils.nearestGoody( pc.getLoc(), grid);
-                    System.out.println("Setting new target: " + target.toString());
-                }
-
-                newFace = PacUtils.euclideanShortestToTarget(
-                        pc.getLoc(), face, target, grid);
-                if( newFace == null ) {
-                    newFace = PacUtils.reverse(face);
-                }
-                System.out.println("New face: " + newFace.name());
-            }
+        if (pc == null) {
+            System.out.println("Error: No Pacman on provided grid");
+            return null;
         }
-        return newFace;
+
+        // Check if you won (no food remaining)
+        if (!PacUtils.foodRemains(grid)) {
+            System.out.println("YOU WIN!");
+            return null;
+        }
+
+        // If there are no moves in the moves queue then create some
+        if (moves.peek() == null) {
+            moves = UniformCostUtils.generateMoves(grid);
+            printPath(moves);
+        }
+
+        return moves.poll();
+    }
+
+    public void printPath(Queue<PacFace> faces) {
+        System.out.println("I should probably make this print the moves");
     }
 }
