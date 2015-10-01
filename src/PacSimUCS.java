@@ -135,6 +135,31 @@ class UniformCostUtils {
         //Setup ArrayList to hold the path
         ArrayList<Point> path = new ArrayList<>();
 
+        while (path.get(path.size() - 1) != b) {
+            PacFace nextFace = PacUtils.euclideanShortestToTarget(
+                path.get(path.size() - 1), PacFace.E, b, grid);
+            if (nextFace == null) {     //    ^v^v I've hard coded the East face in here because it does not matter.
+                nextFace = PacUtils.reverse(PacFace.E); // The code simply uses the face to determine if pacman has to revese
+            }
+            path.add(ptAndFaceToPt(path.get(path.size() - 1), nextFace)); //Add the new point to the list
+        }
+
+        return null;
+    }
+
+    public static PacFace twoPtToFace(Point a, Point b) {
+        return null;
+    }
+
+    public static Point ptAndFaceToPt (Point start, PacFace face) {
+        Point retPt = start;
+        switch (face) {
+            case N: start.translate(  0,  1 ); break;
+            case E: start.translate(  1,  0 ); break;
+            case S: start.translate(  0, -1 ); break;
+            case W: start.translate( -1,  0 ); break;
+        }
+        return retPt;
     }
 }
 
