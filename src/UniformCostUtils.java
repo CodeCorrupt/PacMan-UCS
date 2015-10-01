@@ -19,7 +19,7 @@ public class UniformCostUtils {
         PriorityQueue<Fringe> fringe = new PriorityQueue<>();
         ArrayList<Point> start_list = new ArrayList<Point>();
         start_list.add(PacUtils.findPacman(grid).getLoc());
-        fringe.add(new Fringe(start_list, 0, foods));
+        fringe.add(new Fringe(start_list, foods));
 
         // Kick off UCS
         Fringe answer = UCS(grid, fringe);
