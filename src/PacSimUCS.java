@@ -121,9 +121,9 @@ class UniformCostUtils {
             // For each unvisited food, add that to the fringe
             for (Target trgt : first.getTargets()) {
                 if (!trgt.visited) {
-                    ArrayList<Point> newPath = first.getOrder();
-                    newPath.addAll(pathTo(grid, first.getOrder().get(first.getOrder().size()-1), trgt.loc));
-                    ArrayList<Target> newTargets = first.getTargets();
+                    ArrayList<Point> newPath = new ArrayList<>(first.getOrder());
+                    newPath.addAll(pathTo(grid, first.getOrder().get(first.getOrder().size() - 1), trgt.loc));
+                    ArrayList<Target> newTargets = new ArrayList<>(first.getTargets());
                     newTargets.set(first.getTargets().indexOf(trgt), new Target(trgt.loc, true));
                     fringe.add(new Fringe(newPath, newTargets));
                 }
