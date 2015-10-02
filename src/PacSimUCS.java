@@ -58,6 +58,13 @@ public class PacSimUCS implements PacAction {
             return null;
         }
 
+
+        /////TESTING
+
+        //UniformCostUtils.pathTo(grid, new Point(1,1), new Point(7,5), PacUtils.findPacman(grid).getFace());
+
+
+        /////TESTING
         // If there are no moves in the moves queue then create some
         if (moves == null || moves.peek() == null) {
             moves = UniformCostUtils.generateMoves(grid);
@@ -81,8 +88,71 @@ class UniformCostUtils {
         return null;
     }
 
-    public static ArrayList<PacFace> pathTo(PacCell[][] grid, Point a, Point b, PacFace face) {
-        return null;
+    public static ArrayList<Direction> pathTo(PacCell[][] grid, Point a, Point b, PacFace face) {
+        //Establish fringe
+        PriorityQueue<FringeElement> fringe = new PriorityQueue<>();
+        //Establish fringe
+        ArrayList<Direction> directions = new ArrayList<>();
+        directions.add(new Direction(a, face));
+        fringe.add(new FringeElement(directions, null));
+        // boolean array to hold visited pts
+        boolean[][] visited = new boolean[grid.length][grid[0].length];
+        for (boolean[] col : visited) {
+            for (boolean cell : col) {
+                cell = false;
+            }
+        }
+        while (true) {
+            FringeElement toExpand = fringe.poll();
+            //Check if the cell we're expanding has reached the goal
+            if (toExpand.directions.get(toExpand.directions.size() - 1).pt.equals(b)) {
+                return toExpand.directions;
+
+            }
+
+            Direction nDir = null;
+            Direction lDir = toExpand.directions.get(toExpand.directions.size() - 1);
+
+            //Check North
+            nDir = new Direction(new Point(lDir.pt.x, lDir.pt.y - 1), PacFace.N);
+            if (!(grid[nDir.pt.x][nDir.pt.y] instanceof WallCell)
+                    && !visited[nDir.pt.x][nDir.pt.y]) {
+                ArrayList<Direction> newDirections = new ArrayList<>(toExpand.directions);
+                newDirections.add(nDir); //Add new direction to new list
+                fringe.add(new FringeElement(newDirections, null));
+                visited[nDir.pt.x][nDir.pt.y] = true;
+            }
+
+            //Check South
+            nDir = new Direction(new Point(lDir.pt.x, lDir.pt.y + 1), PacFace.S);
+            if (!(grid[nDir.pt.x][nDir.pt.y] instanceof WallCell)
+                    && !visited[nDir.pt.x][nDir.pt.y]) {
+                ArrayList<Direction> newDirections = new ArrayList<>(toExpand.directions);
+                newDirections.add(nDir); //Add new direction to new list
+                fringe.add(new FringeElement(newDirections, null));
+                visited[nDir.pt.x][nDir.pt.y] = true;
+            }
+
+            //Check East
+            nDir = new Direction(new Point(lDir.pt.x + 1, lDir.pt.y), PacFace.E);
+            if (!(grid[nDir.pt.x][nDir.pt.y] instanceof WallCell)
+                    && !visited[nDir.pt.x][nDir.pt.y]) {
+                ArrayList<Direction> newDirections = new ArrayList<>(toExpand.directions);
+                newDirections.add(nDir); //Add new direction to new list
+                fringe.add(new FringeElement(newDirections, null));
+                visited[nDir.pt.x][nDir.pt.y] = true;
+            }
+
+            //Check West
+            nDir = new Direction(new Point(lDir.pt.x - 1, lDir.pt.y), PacFace.W);
+            if (!(grid[nDir.pt.x][nDir.pt.y] instanceof WallCell)
+                    && !visited[nDir.pt.x][nDir.pt.y]) {
+                ArrayList<Direction> newDirections = new ArrayList<>(toExpand.directions);
+                newDirections.add(nDir); //Add new direction to new list
+                fringe.add(new FringeElement(newDirections, null));
+                visited[nDir.pt.x][nDir.pt.y] = true;
+            }
+        }
     }
 
     public static Queue<Direction> UCS(PacCell[][] grid, Fringe fringe) {
@@ -102,6 +172,7 @@ class UniformCostUtils {
         return foods;
     }
 }
+
 
 // Stored the fringe and all methods to interact with it
 class Fringe {
