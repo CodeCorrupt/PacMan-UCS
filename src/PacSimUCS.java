@@ -58,13 +58,6 @@ public class PacSimUCS implements PacAction {
             return null;
         }
 
-
-        /////TESTING
-
-        //UniformCostUtils.pathTo(grid, new Point(1,1), new Point(7,5), PacUtils.findPacman(grid).getFace());
-
-
-        /////TESTING
         // If there are no moves in the moves queue then create some
         if (moves == null || moves.peek() == null) {
             moves = UniformCostUtils.generateMoves(grid);
@@ -83,9 +76,15 @@ class UniformCostUtils {
     public static Queue<PacFace> generateMoves(PacCell[][] grid) {
         //Establish fringe
         Fringe fringe = new Fringe(grid);
-        ArrayList<Food> foods = findFood(grid);
-        Queue<Direction> directions = UCS(grid, fringe);
-        return null;
+        ArrayList<Direction> directions = UCS(grid, fringe);
+        directions.remove(0); //Remove first element because it's pacmans current location
+        // Queue for moves.
+        Queue<PacFace> moves = new LinkedList<>();
+        //Read directions intto moves queue
+        for (Direction direction : directions) {
+            moves.add(direction.face);
+        }
+        return moves;
     }
 
     public static ArrayList<Direction> pathTo(PacCell[][] grid, Point a, Point b, PacFace face) {
@@ -106,8 +105,8 @@ class UniformCostUtils {
             FringeElement toExpand = fringe.poll();
             //Check if the cell we're expanding has reached the goal
             if (toExpand.directions.get(toExpand.directions.size() - 1).pt.equals(b)) {
+                toExpand.directions.remove(0);
                 return toExpand.directions;
-
             }
 
             Direction nDir = null;
@@ -155,8 +154,34 @@ class UniformCostUtils {
         }
     }
 
-    public static Queue<Direction> UCS(PacCell[][] grid, Fringe fringe) {
-        return null;
+    public static ArrayList<Direction> UCS(PacCell[][] grid, Fringe fringe) {
+        boolean keepGoing; //Has to be true to start loop
+        while (true) {
+            keepGoing = false; //Assume we're done until proven otherwise
+            //Take first element off fringe
+            FringeElement toExpand = fringe.dequeueNext();
+            ArrayList<Food> lFoods = toExpand.foods;
+            // Add the path to EACH of the remaining foods to the fringe
+            for (Food fud : lFoods) {
+                if (fud.visited == false) {
+                    keepGoing = true; // If we had to expand a food then we haven't reached goal state
+                    // ArrayList to store new directions
+                    ArrayList<Direction> nDirs = new ArrayList<>(toExpand.directions);
+                    // Get the last direction to pass to pathTo
+                    Direction lDir = toExpand.directions.get(toExpand.directions.size() - 1);
+                    nDirs.addAll(pathTo(grid, lDir.pt, fud.loc,lDir.face));
+                    // create new food list to store visited
+                    ArrayList<Food> nFoods = new ArrayList<>(lFoods);
+                    nFoods.set(lFoods.indexOf(fud), new Food(fud.loc, true)); //set food to visited
+                    //Add new fringe element to fringe
+                    FringeElement nFringe = new FringeElement(nDirs, nFoods);
+                    fringe.add(nFringe);
+                }
+            }
+            if (keepGoing == false) {
+                return toExpand.directions;
+            }
+        }
     }
 
     public static ArrayList<Food> findFood(PacCell[][] grid) {
