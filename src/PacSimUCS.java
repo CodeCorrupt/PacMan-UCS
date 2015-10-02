@@ -77,13 +77,16 @@ class UniformCostUtils {
         //Establish fringe
         Fringe fringe = new Fringe(grid);
         ArrayList<Direction> directions = UCS(grid, fringe);
-        directions.remove(0); //Remove first element because it's pacmans current location
         // Queue for moves.
         Queue<PacFace> moves = new LinkedList<>();
-        //Read directions intto moves queue
+        //Read directions into moves queue
+        //Also print required stuffs
+        System.out.printf("\nSolution Path:\n");
         for (Direction direction : directions) {
             moves.add(direction.face);
+            System.out.printf("(%d,%d)\n", direction.pt.x, direction.pt.y);
         }
+        moves.poll(); //Remove first element because it's pacmans current location
         return moves;
     }
 
@@ -156,6 +159,7 @@ class UniformCostUtils {
 
     public static ArrayList<Direction> UCS(PacCell[][] grid, Fringe fringe) {
         boolean keepGoing; //Has to be true to start loop
+        int count = 0; //Count for the required output
         while (true) {
             keepGoing = false; //Assume we're done until proven otherwise
             //Take first element off fringe
@@ -176,9 +180,13 @@ class UniformCostUtils {
                     //Add new fringe element to fringe
                     FringeElement nFringe = new FringeElement(nDirs, nFoods);
                     fringe.add(nFringe);
+                    // Required output
+                    if ((++count % 1000) == 0) //Incremement count and check if it's %1000
+                        System.out.printf("Nodes Expanded: %d\n", count);
                 }
             }
             if (keepGoing == false) {
+                System.out.printf("\nNodes Expanded: %d\n", count);
                 return toExpand.directions;
             }
         }
@@ -228,6 +236,10 @@ class Fringe {
 
     public void add(FringeElement element) {
         fringe.add(element);
+    }
+
+    public int size() {
+        return fringe.size();
     }
 }
 
