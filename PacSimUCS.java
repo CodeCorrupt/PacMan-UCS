@@ -1,3 +1,12 @@
+/*
+ * University of Central Florida
+ * Introduction to Artificial Intelligence
+ *          CAP-4630
+ * Fall 2015
+ *
+ * Author: Tyler Hoyt
+ *    PID: t2650010
+ */
 import pacsim.*;
 
 import javax.swing.*;
